@@ -2,9 +2,17 @@ import nidaqmx as ni
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+'''
+Comparing different methods to take a read() measurements and append it to an array.
 
-# Comparing different methods to take a read() measurements and append it to an array.
+First method creates an array with predefined length. To append the data to the array, set the value of the item in an
+array equal to the read() output.
 
+Second method creates an empty array, then use np.append() to add the value to the array. 
+
+In theory, method 1 should be faster at appending read() to a list, which would increase the max frequency at which
+we can take measurements. In practice, there is no measurable difference in the measuring frequency (about 25 Hz)
+'''
 
 # Define task and input channel
 task = ni.Task()
