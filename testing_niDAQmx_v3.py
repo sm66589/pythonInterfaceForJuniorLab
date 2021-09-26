@@ -82,9 +82,3 @@ print()
 print()
 print("mean time interval between data points:", np.average(timeDiff))
 print("std of time intervals:", np.std(timeDiff))
-
-print("this is a change, testing pushing and commiting")
-
-print("testing to push to a different branch")
-
-print("more testing")
