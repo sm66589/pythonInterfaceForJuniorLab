@@ -23,7 +23,6 @@ task.ai_channels.add_ai_voltage_chan("Dev3/ai2")
 
 measurement_time = 5    #seconds
 
-
 # take readings and append them to their respective list for measurement_time in seconds.
 data_lst = []
 time_lst = []
