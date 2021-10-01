@@ -15,13 +15,15 @@ we can take measurements. In practice, there is no measurable difference in the 
 '''
 
 # Define task and input channel
+device = "Dev4"
+
 task = ni.Task()
-task.ai_channels.add_ai_voltage_chan("Dev3/ai0")
-task.ai_channels.add_ai_voltage_chan("Dev3/ai1")
-task.ai_channels.add_ai_voltage_chan("Dev3/ai2")
+task.ai_channels.add_ai_voltage_chan(device + "/ai0")
+task.ai_channels.add_ai_voltage_chan(device + "/ai1")
+task.ai_channels.add_ai_voltage_chan(device + "/ai2")
 
 measurementTime = 5  # seconds
-numberOfPoints = 1000
+numberOfPoints = 100
 
 
 ########################################################################################################################
@@ -30,23 +32,21 @@ numberOfPoints = 1000
 ########################################################################################################################
 
 # take readings and append them to their respective list for measurement_time in seconds.
-dataArr = np.array([])
-timeArr = np.array([])
+dataLst = []
+timeLst = []
 timeInitial = time.time()
-while (time.time() - timeInitial) < measurementTime:
-    np.append(dataArr, task.read())
-    np.append(timeArr, time.time() - timeInitial)
+for i in range(numberOfPoints):
+    dataLst.append(task.read())
+    timeLst.append(time.time() - timeInitial)
 
 
 #divide by columns
-ai0Volts = np.asarray([])
-ai1Volts = np.asarray([])
-ai2Volts = np.asarray([])
+dataArr = np.asarray(dataLst)
+timeArr = np.asarray(timeLst)
 
-for i in range(len(dataArr)):
-    ai0Volts = np.append(ai0Volts, dataArr[i][0])
-    ai1Volts = np.append(ai1Volts, dataArr[i][1])
-    ai2Volts = np.append(ai2Volts, dataArr[i][2])
+ai0Volts = dataArr[:, 0]
+ai1Volts = dataArr[:, 1]
+ai2Volts = dataArr[:, 2]
 
 
 plt.plot(timeArr, ai0Volts, label="ai0")
@@ -62,13 +62,14 @@ plt.plot(timeDiff)
 plt.show()
 
 print()
+print("METHOD 1: ")
 print("number of points:", numberOfPoints)
 print("total time:", timeArr[-1])
 print("frequency:", numberOfPoints / timeArr[-1])
 print()
-print()
 print("mean time interval between reads:", np.average(timeDiff))
 print("std of time intervals:", np.std(timeDiff))
+print()
 
 
 ########################################################################################################################
@@ -77,23 +78,22 @@ print("std of time intervals:", np.std(timeDiff))
 ########################################################################################################################
 
 # populate lists
-dataArr = np.asarray([None] * numberOfPoints)   # TODO: try to make a 2D array. Replace [None] with None.
-timeArr = np.asarray([None] * numberOfPoints)
+dataLst = [None] * numberOfPoints
+timeLst = [None] * numberOfPoints
 
 timeInitial = time.time()
 for i in range(numberOfPoints):
-    dataArr[i] = task.read()
-    timeArr[i] = time.time() - timeInitial
+    dataLst[i] = task.read()
+    timeLst[i] = time.time() - timeInitial
 
+task.close()
 
-ai0Volts = np.asarray([])
-ai1Volts = np.asarray([])
-ai2Volts = np.asarray([])
+dataArr = np.asarray(dataLst)
+timeArr = np.asarray(timeLst)
 
-for i in range(len(dataArr)):
-    ai0Volts = np.append(ai0Volts, dataArr[i][0])
-    ai1Volts = np.append(ai1Volts, dataArr[i][1])
-    ai2Volts = np.append(ai2Volts, dataArr[i][2])
+ai0Volts = dataArr[:, 0]
+ai1Volts = dataArr[:, 1]
+ai2Volts = dataArr[:, 2]
 
 
 plt.plot(timeArr, ai0Volts, label="ai0")
@@ -109,14 +109,11 @@ plt.plot(timeDiff)
 plt.show()
 
 print()
+print("SECOND METHOD: ")
 print("number of points:", numberOfPoints)
 print("total time:", timeArr[-1])
 print("frequency:", numberOfPoints / timeArr[-1])
 print()
-print()
 print("mean time interval between reads:", np.average(timeDiff))
 print("std of time intervals:", np.std(timeDiff))
 
-
-
-task.close()
