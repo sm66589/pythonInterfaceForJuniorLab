@@ -27,6 +27,7 @@ task.start()
 initialTime = time.time()
 while time.time() - initialTime <= countInterval:
     data = task.read()
+task.stop()
 
 print(data)
 
