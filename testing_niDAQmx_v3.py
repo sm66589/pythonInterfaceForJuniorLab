@@ -29,11 +29,15 @@ numberOfPoints = 1000
 dataLst = [None] * numberOfPoints
 timeLst = [None] * numberOfPoints
 
+
+# Using the task.start() and task.stop() methods highly increases the count rate from ~25 Hz to almost 550 Hz.
+task.start()     # <---- This is very important
 timeInitial = time.time()
 for i in range(numberOfPoints):
     dataLst[i] = task.read()
     timeLst[i] = time.time() - timeInitial
 
+task.stop()    # <----- This is very important
 task.close()
 
 dataArr = np.asarray(dataLst)
