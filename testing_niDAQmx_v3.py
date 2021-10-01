@@ -26,25 +26,22 @@ measurementTime = 5  # seconds
 numberOfPoints = 1000
 
 # populate lists
-dataArr = np.asarray([None] * numberOfPoints)
-timeArr = np.asarray([None] * numberOfPoints)
+dataLst = [None] * numberOfPoints
+timeLst = [None] * numberOfPoints
 
 timeInitial = time.time()
 for i in range(numberOfPoints):
-    dataArr[i] = task.read()
-    timeArr[i] = time.time() - timeInitial
+    dataLst[i] = task.read()
+    timeLst[i] = time.time() - timeInitial
 
 task.close()
 
+dataArr = np.asarray(dataLst)
+timeArr = np.asarray(timeLst)
 
-ai0Volts = np.asarray([])
-ai1Volts = np.asarray([])
-ai2Volts = np.asarray([])
-
-for i in range(len(dataArr)):
-    ai0Volts = np.append(ai0Volts, dataArr[i][0])
-    ai1Volts = np.append(ai1Volts, dataArr[i][1])
-    ai2Volts = np.append(ai2Volts, dataArr[i][2])
+ai0Volts = dataArr[:, 0]
+ai1Volts = dataArr[:, 1]
+ai2Volts = dataArr[:, 2]
 
 
 plt.plot(timeArr, ai0Volts, label="ai0")
@@ -53,24 +50,24 @@ plt.plot(timeArr, ai2Volts, label="ai2")
 plt.legend()
 plt.show()
 
-save_file = open(r"C://Users\sebas\Documents\UT\Fall2021\LA\Python_interface_to_replace_LabView\data\gasLaw_test_predefinedArray.txt", "w")
-save_file.write("ai0,    ai1,    ai2,    time")
-
-for i in range(len(timeArr)):
-    str_ai0 = str(ai0Volts[i])
-    str_ai1 = str(ai1Volts[i])
-    str_ai2 = str(ai2Volts[i])
-    str_time = str(timeArr[i])
-    delimiter = ","
-
-    save_file.write(
-        "\n"
-        + str_ai0 + delimiter
-        + str_ai1 + delimiter
-        + str_ai2
-    )
-save_file.close()
-
+# save_file = open(r"C://Users\sebas\Documents\UT\Fall2021\LA\Python_interface_to_replace_LabView\data\gasLaw_test_predefinedArray.txt", "w")
+# save_file.write("ai0,    ai1,    ai2,    time")
+#
+# for i in range(len(timeArr)):
+#     str_ai0 = str(ai0Volts[i])
+#     str_ai1 = str(ai1Volts[i])
+#     str_ai2 = str(ai2Volts[i])
+#     str_time = str(timeArr[i])
+#     delimiter = ","
+#
+#     save_file.write(
+#         "\n"
+#         + str_ai0 + delimiter
+#         + str_ai1 + delimiter
+#         + str_ai2
+#     )
+# save_file.close()
+#
 print()
 print("number of points:", numberOfPoints)
 print("total time:", timeArr[-1])
