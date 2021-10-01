@@ -15,10 +15,12 @@ faster than appending to a list with undefined size.
 '''
 
 # Define task and input channel
+device = "Dev4"
+
 task = ni.Task()
-task.ai_channels.add_ai_voltage_chan("Dev3/ai0")
-task.ai_channels.add_ai_voltage_chan("Dev3/ai1")
-task.ai_channels.add_ai_voltage_chan("Dev3/ai2")
+task.ai_channels.add_ai_voltage_chan(device + "/ai0")
+task.ai_channels.add_ai_voltage_chan(device + "/ai1")
+task.ai_channels.add_ai_voltage_chan(device + "/ai2")
 
 measurementTime = 5  # seconds
 numberOfPoints = 1000
