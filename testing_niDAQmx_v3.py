@@ -13,6 +13,8 @@ populate the list. Populating an array of pre-defined size is supposedly
 faster than appending to a list with undefined size. 
 
 Oct 7 2021 update: Using time.sleep() doesn't allow for good control of the frequency. 
+Tried adding a while loop to wait until the time deltaT has passed. Seems to work better (?).
+Need further testing to check.
 
 '''
 
