@@ -12,23 +12,28 @@ Contrast this method with creating an empty list and using lst.append() to
 populate the list. Populating an array of pre-defined size is supposedly 
 faster than appending to a list with undefined size. 
 
+Oct 7 2021 update: Using time.sleep() doesn't allow for good control of the frequency. 
+
 '''
 
 # Define task and input channel
-device = "Dev4"
+device = "Dev2"
 
 task = ni.Task()
 task.ai_channels.add_ai_voltage_chan(device + "/ai0")
 task.ai_channels.add_ai_voltage_chan(device + "/ai1")
 task.ai_channels.add_ai_voltage_chan(device + "/ai2")
 
-measurementTime = 5  # seconds
-numberOfPoints = 1000
+
+#measurementTime = 5  # seconds
+numberOfPoints = 500
+frequency = 100
+deltaT = 1.0/frequency   #seconds
+
 
 # populate lists
 dataLst = [None] * numberOfPoints
 timeLst = [None] * numberOfPoints
-
 
 # Using the task.start() and task.stop() methods highly increases the count rate from ~25 Hz to almost 550 Hz.
 task.start()     # <---- This is very important
@@ -37,7 +42,10 @@ for i in range(numberOfPoints):
     dataLst[i] = task.read()
     timeLst[i] = time.time() - timeInitial
 
-task.stop()    # <----- This is very important
+    while time.time() - timeInitial - timeLst[i] < deltaT:
+        continue
+
+task.stop()    # <---- This is very important
 task.close()
 
 dataArr = np.asarray(dataLst)
