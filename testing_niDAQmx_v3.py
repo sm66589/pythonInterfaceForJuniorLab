@@ -16,10 +16,14 @@ Oct 7 2021 update: Using time.sleep() doesn't allow for good control of the freq
 Tried adding a while loop to wait until the time deltaT has passed. Seems to work better (?).
 Need further testing to check.
 
+Oct 7 2021 update2: Moreover on time.sleep(), setting time.sleep(0) will simply skip the loop.
+However, setting time.sleep(1e-52) will not skip it, which limits the sampling rate to around 65 Hz,
+even though the sleep time is essentially 0. 
+
 '''
 
 # Define task and input channel
-device = "Dev2"
+device = "Dev3"
 
 task = ni.Task()
 task.ai_channels.add_ai_voltage_chan(device + "/ai0")
@@ -28,7 +32,7 @@ task.ai_channels.add_ai_voltage_chan(device + "/ai2")
 
 
 #measurementTime = 5  # seconds
-numberOfPoints = 500
+numberOfPoints = 50
 frequency = 100
 deltaT = 1.0/frequency   #seconds
 
@@ -39,13 +43,14 @@ timeLst = [None] * numberOfPoints
 
 # Using the task.start() and task.stop() methods highly increases the count rate from ~25 Hz to almost 550 Hz.
 task.start()     # <---- This is very important
-timeInitial = time.time()
-for i in range(numberOfPoints):
-    dataLst[i] = task.read()
-    timeLst[i] = time.time() - timeInitial
 
-    while time.time() - timeInitial - timeLst[i] < deltaT:
-        continue
+timeInitial = time.time()
+timeLst[0] = timeInitial
+dataLst[0] = task.read()
+for i in range(1, numberOfPoints):
+    timeLst[i] = time.time()
+    dataLst[i] = task.read()
+
 
 task.stop()    # <---- This is very important
 task.close()
@@ -56,6 +61,7 @@ timeArr = np.asarray(timeLst)
 ai0Volts = dataArr[:, 0]
 ai1Volts = dataArr[:, 1]
 ai2Volts = dataArr[:, 2]
+timeArr -= timeInitial
 
 
 plt.plot(timeArr, ai0Volts, label="ai0")
@@ -83,9 +89,9 @@ plt.show()
 # save_file.close()
 #
 print()
-print("number of points:", numberOfPoints)
-print("total time:", timeArr[-1])
-print("frequency:", numberOfPoints / timeArr[-1])
+print("number of points:", len(timeArr))
+print("total time:", timeArr[-1] - timeArr[0])
+print("frequency:", numberOfPoints / (timeArr[-1] - timeArr[0]))
 
 
 timeDiff = timeArr[1:] - timeArr[:-1]
@@ -95,3 +101,7 @@ print()
 print()
 print("mean time interval between data points:", np.average(timeDiff))
 print("std of time intervals:", np.std(timeDiff))
+
+print()
+print()
+print("avg frequency from mean time interval:", 1/np.average(timeDiff))
