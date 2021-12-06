@@ -34,3 +34,4 @@ print(data)
 task.close()
 #TODO: Understand how task.read() works for counters. Why does data need to be redefines everytime during the loop?
 
+
