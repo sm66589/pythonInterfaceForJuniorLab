@@ -5,16 +5,12 @@ import matplotlib.pyplot as plt
 from numpy import ndarray
 
 '''
-Try to create an array with size numberOfPoints and populate the array with 
-numberOfPoints voltage readings. 
- 
-Contrast this method with creating an empty list and using lst.append() to 
-populate the list. Populating an array of pre-defined size is supposedly 
-faster than appending to a list with undefined size. 
+
+
 
 '''
 
-# Define task and input channel
+# Define task and input channels. Task is an object from the NI library.
 device = "Dev4"
 
 task = ni.Task()
@@ -22,41 +18,40 @@ task.ai_channels.add_ai_voltage_chan(device + "/ai0")
 task.ai_channels.add_ai_voltage_chan(device + "/ai1")
 task.ai_channels.add_ai_voltage_chan(device + "/ai2")
 
-#measurementTime = 10  # seconds
-numberOfPoints = 10000
+# Set total acquisition time in seconds. Acquisition frequency is fixed to ~450 Hz.
 acqTime = 10  # seconds
-period = 1
 
-# populate lists
-dataLst = []
-timeLst = []
 
 
 # Using the task.start() and task.stop() methods highly increases the count rate from ~25 Hz to almost 550 Hz.
-task.start()     # <---- This is very important
+dataLst = []
+timeLst = []
+
+task.start()   # <---- This is very important
 timeInitial = time.time()
+
 while time.time() - timeInitial <= acqTime:
     dataLst.append(task.read())
     timeLst.append(time.time() - timeInitial)
-    time.sleep(period - 0.005)
 
 task.stop()    # <----- This is very important
-task.close()
 
+task.close()   # Once data collection is finished, the task needs to be closed.
+
+
+
+# convert lists into numpy arrays for easier data analysis.
 dataArr = np.asarray(dataLst)
 timeArr = np.asarray(timeLst)
 
+# separate dataArr into columns for their respective channels.
 ai0Volts = dataArr[:, 0]
 ai1Volts = dataArr[:, 1]
 ai2Volts = dataArr[:, 2]
 
 
-plt.plot(timeArr, ai0Volts, label="ai0")
-plt.plot(timeArr, ai1Volts, label="ai1")
-#plt.plot(timeArr, ai2Volts, label="ai2")
-plt.legend()
-plt.show()
 
+# save data to a file. Make sure the save path is correct.
 save_file = open(r"C://Users\sebas\Documents\UT\Fall2021\LA\Python_interface_to_replace_LabView\data\gasLaw_test_predefinedArray.txt", "w")
 save_file.write("ai0,    ai1,    ai2,    time")
 
@@ -71,10 +66,23 @@ for i in range(len(timeArr)):
         "\n"
         + str_ai0 + delimiter
         + str_ai1 + delimiter
-        + str_ai2
+        + str_ai2 + delimiter
+        + str_time
     )
 save_file.close()
-#
+
+
+
+# plotting data.
+plt.plot(timeArr, ai0Volts, '-.', label="ai0")
+plt.plot(timeArr, ai1Volts, '-.', label="ai1")
+plt.plot(timeArr, ai2Volts, '-.', label="ai2")
+plt.legend()
+plt.show()
+
+
+
+# # the section below is characterizing the acquisiton frequency.
 # print()
 # print("number of points:", numberOfPoints)
 # print("total time:", timeArr[-1])
